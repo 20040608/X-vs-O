@@ -10,30 +10,29 @@ var game = {
     nextMove: [null, null], // Used to store move calculated by minimax.
     winner: "", // Stores winning mark.
     gameOver: false // Flag indicating whether the game has ended.
-  }
+}
   
-  var darkColor = "#2c3e50";
+var darkColor = "#2c3e50"; 
+var $narrativeOne = $("#game-narrative-one");
+var $narrativeTwo = $("#game-narrative-two");
+var $narrativeThree = $("#game-narrative-three");
+var $narrativeFour = $("#game-narrative-four");
   
-  var $narrativeOne = $("#game-narrative-one");
-  var $narrativeTwo = $("#game-narrative-two");
-  var $narrativeThree = $("#game-narrative-three");
-  var $narrativeFour = $("#game-narrative-four");
+var computerThreats = ["Приготовьтесь претерпеть крайнее унижение!",
+                        "Я уничтожу тебя!",
+                        "Я непобедим!",
+                        "Тебе не победить меня!",
+                        "Вы будете уничтожены!",
+                        "Ты потерпишь неудачу!",
+                        "Бойся меня!",
+                        "Я отомщу!",
+                        "Я голоден!"]
   
-  var computerThreats = ["Prepare to suffer extreme humiliation!",
-                        "I will destroy you!",
-                        "I am invincible!",
-                        "You cannot defeat me!",
-                        "You will be annihilated!",
-                        "You will fail!",
-                        "Fear me!",
-                        "Vengeance is mine!",
-                        "I hunger!"]
+var $identityBtn = $(".identity-cell");
+var $gameBtn = $(".game-cell");
+var $gameResetBtn = $("#game-reset-btn");
   
-  var $identityBtn = $(".identity-cell");
-  var $gameBtn = $(".game-cell");
-  var $gameResetBtn = $("#game-reset-btn");
-  
-  $(document).ready(function() {
+$(document).ready(function() {
     $narrativeOne.hide();
     $narrativeTwo.hide();
     $narrativeThree.hide();
@@ -41,84 +40,76 @@ var game = {
     $("#header").hide();
     $("#game-configuration").hide();
     $("#game-grid").hide();
-    $("#game-over").hide();
-    
+    $("#game-over").hide();  
     $narrativeOne.fadeIn(500);
-  });
+});
   
-  $("#narrative-one-btn").on('click', function() {
+$("#narrative-one-btn").on('click', function() {
     var transitionPeriod = 500;
     $narrativeOne.fadeOut(transitionPeriod);
     setTimeout(function() {
       $narrativeTwo.fadeIn(transitionPeriod);
     }, transitionPeriod);
-  });
+});
   
-  $("#narrative-two-btn").on('click', function() {
+$("#narrative-two-btn").on('click', function() {
     var transitionPeriod = 500;
     $narrativeTwo.fadeOut(transitionPeriod);
     setTimeout(function() {
       $narrativeThree.fadeIn(transitionPeriod);
     }, transitionPeriod);
-  });
+});
   
-  $("#narrative-three-btn").on('click', function() {
+$("#narrative-three-btn").on('click', function() {
     var transitionPeriod = 500;
     $narrativeThree.fadeOut(transitionPeriod);
     setTimeout(function() {
       $("#tic-text").hide();
       $("#tac-text").hide();
       $("#doom-text").hide();
-      $("#header").show();
-      
+      $("#header").show();      
       $("#tic-text").show();
       setTimeout(function(){
         $("#tac-text").show();
         setTimeout(function() {
           $("body").css("background-color", darkColor);
-          $("#doom-text").show();
-          
+          $("#doom-text").show();          
           setTimeout(function(){
-            $("#game-configuration").fadeIn(transitionPeriod);
-            
+            $("#game-configuration").fadeIn(transitionPeriod);            
           }, transitionPeriod * 2);
         }, transitionPeriod * 2);
       }, transitionPeriod * 2);
     }, transitionPeriod * 2);
-  });
+});
   
   
   
-  // When a player initially chooses their mark before playing.
-  $identityBtn.on('click', function() {
-  
+// When a player initially chooses their mark before playing.
+$identityBtn.on('click', function() {
     // Grabbing value from the HTML element
     game.playerMark = $(this).attr("value");
     if (game.playerMark === "X"){
       game.aiMark = "O";
     } else {
       game.aiMark = "X";
-    }
-    
+    }   
     startGame();
-  });
+});
   
-  function startGame(){
+function startGame(){
     // Transitioning between config menu to game grid.
     $("#game-configuration").hide();
-    $("#game-grid").fadeIn(500);
-    
+    $("#game-grid").fadeIn(500);   
     if (!game.playerTurn)
       aiPlay();
-  }
+}
   
-  $gameBtn.on('click', function() {
+$gameBtn.on('click', function() {
     if (game.playerTurn) {
       // Parsing player's move
       var cell = $(this).attr("id");
       var row = parseInt(cell[1]);
-      var col = parseInt(cell[2]);
-  
+      var col = parseInt(cell[2]);  
       if (spaceFree(game.board, row, col)) {
         makePlay(game.playerMark, row, col); // Commit move to the game board.
         checkPlay(game.playerMark); // Check if the move resulted in a win.
@@ -128,31 +119,24 @@ var game = {
     } else {
       // Do nothing (not player's turn)
     }
+});
   
-  });
-  
-  function aiPlay() {
+function aiPlay() {
     var aiThinkingDelay = 1000;
     setTimeout(function() {
-      
       minimax(game, 0); // Use minimax to calculate the next optimal move.
       makePlay(game.aiMark, game.nextMove[0], game.nextMove[1]); // Commit move to the game board.
       checkPlay(game.aiMark); // Check if the move resulted in a win.
-      
-      
       var randThreat = computerThreats[Math.floor(Math.random() * computerThreats.length)];
       $("#computer-threat-text").text(randThreat);
       $("#computer-threat-text").fadeIn(250);
       setTimeout(function() {
         $("#computer-threat-text").fadeOut(250);
       }, 2000);
-      
-    }, aiThinkingDelay);
-    
-    
-  }
+    }, aiThinkingDelay);    
+}
   
-  function checkPlay(mark) {
+function checkPlay(mark) {
     const gameOverDelay = 2000;
     if (hasWon()) {
       const gameOverDelay = 2000; // Wait two second to allow win animation to play out.
@@ -174,51 +158,43 @@ var game = {
         aiPlay(); // If it's not the players turn, initiate computer turn.
       }
     }
-  }
+}
   
-  function spaceFree(board, row, col) {
+function spaceFree(board, row, col) {
     // Checks if a player can mark a selected cell.
     return (board[row][col] === null)
-  }
+}
   
-  function makePlay(mark, row, col) {
+function makePlay(mark, row, col) {
     // Saving move to game    
     game.board[row][col] = mark;
-    game.turnsPlayed++;
-    
+    game.turnsPlayed++;    
     var cellId = "#c" + row + "" + col;
     // Stylising game cell to reflect an ai move.
     $(cellId).text(mark);
-    $(cellId).addClass("cell-selected");
-    
-  }
+    $(cellId).addClass("cell-selected");    
+}
   
-  function minimax(state, depth){
-    // Inspired by http://neverstopbuilding.com/minimax
-    
+function minimax(state, depth){
+    // Inspired by http://neverstopbuilding.com/minimax   
     // Creating a replicated object of the game state to avoid
     // editing the existing game state (it has been passed 'byRef')
     // See http://stackoverflow.com/questions/122102/what-is-the-most-efficient-way-to-deep-clone-an-object-in-javascript/5344074#5344074
-    var gameState = JSON.parse(JSON.stringify(state));
-    
+    var gameState = JSON.parse(JSON.stringify(state));    
     if (gameState.gameOver){
       // If game is in an end state (win, lose, draw) return corresponding score (10, -10, 0)
-      return getScore(gameState, depth);
-      
+      return getScore(gameState, depth);      
     } else {
       depth++; // Iterate depth as algorithm gets recursively deeper. Used to choose moves that prolong defeat, hasten victory.
       var moves = []; // Used to store all possible moves in this current game state.
-      var scores = []; // Used to store the corresponding scores resulting from each of those moves.
-      
-      moves = generateAllAvailableMoves(gameState); // Generate an array of all available coordinates on the game board.
-      
+      var scores = []; // Used to store the corresponding scores resulting from each of those moves.      
+      moves = generateAllAvailableMoves(gameState); // Generate an array of all available coordinates on the game board.      
       for (var i = 0; i < moves.length; i++) {
         // For each possible move, create a simulation game state where the move has been played.
         var possibleGameState = generatePossibleGame(gameState, moves[i]);
         // Then store the resultant score, recursively calling the minimax algorithm.
         scores.push(minimax(possibleGameState, depth));
-      }
-      
+      }      
       if (gameState.playerTurn) {
         // MAX
         var maxScoreIndex = findIndexOfMax(scores); // In the case of it being the protagonist's turn, find the highest equating score.
@@ -231,11 +207,11 @@ var game = {
         return scores[minScoreIndex];
       }
     }
-  }
+}
   
-  // Equates game states to scores
-  // Wins equating to 10, loses equating to -10, draws or continued gameplay equating to 0.
-  function getScore(gameState, depth) {
+// Equates game states to scores
+// Wins equating to 10, loses equating to -10, draws or continued gameplay equating to 0.
+function getScore(gameState, depth) {
     if (gameState.gameOver && gameState.winner === gameState.playerMark) {
       return 10 - depth;
     } else if (gameState.gameOver && gameState.winner === gameState.aiMark) {
@@ -243,14 +219,13 @@ var game = {
     } else {
       return 0;
     }
-  }
+}
   
-  // Returns an array of the coordinates (row, column) of all available cells in a particular game state.
-  function generateAllAvailableMoves(gameState){
+// Returns an array of the coordinates (row, column) of all available cells in a particular game state.
+function generateAllAvailableMoves(gameState){
     const rowLength = 3;
     const colLength = 3;
-    var availableMoves = [];
-    
+    var availableMoves = [];    
     for (var row = 0; row < rowLength; row++){
       for (var col = 0; col < colLength; col++){
         if (spaceFree(gameState.board, row, col)){
@@ -260,20 +235,18 @@ var game = {
       }
     }
     return availableMoves;
-  }
+}
   
-  // Creates a simulated game state when a specified move is executed.
-  function generatePossibleGame(state, move){
-    var gameState = JSON.parse(JSON.stringify(state));
-    
+// Creates a simulated game state when a specified move is executed.
+function generatePossibleGame(state, move){
+    var gameState = JSON.parse(JSON.stringify(state));    
     // Execute the move
     if (gameState.playerTurn){
       gameState.board[move[0]][move[1]] = gameState.playerMark;
     } else {
       gameState.board[move[0]][move[1]] = gameState.aiMark;
     }
-    gameState.turnsPlayed++;
-    
+    gameState.turnsPlayed++;    
     // Check if the move has resulted in an end game state.
     if (checkWin(gameState)) {
       gameState.gameOver = true;
@@ -287,13 +260,12 @@ var game = {
       gameState.winner = "draw";
     } else {
       gameState.playerTurn = !gameState.playerTurn;
-    }
-    
+    }    
     return gameState;
-  }
+}
   
-  // Finds the index of the highest value in an array.
-  function findIndexOfMax(arr) {
+// Finds the index of the highest value in an array.
+function findIndexOfMax(arr) {
     var maxIndex = 0;
     if (arr.length > 1) {
       for (var i = 1; i < arr.length; i++){
@@ -303,10 +275,10 @@ var game = {
       }
     }
     return maxIndex;
-  }
+}
   
-  // Finds the index of the lowest value in an array.
-  function findIndexOfMin(arr) {
+// Finds the index of the lowest value in an array.
+function findIndexOfMin(arr) {
     var minIndex = 0;
     if (arr.length > 1) {
       for (var i = 1; i < arr.length; i++){
@@ -316,21 +288,19 @@ var game = {
       }
     }
     return minIndex;
-  }
+}
   
-  // Used to check if the last played move has resulted in a win.
-  function checkWin(gameState) {
+// Used to check if the last played move has resulted in a win.
+function checkWin(gameState) {
     const numRows = 3;
-    const numCols = 3;
-  
+    const numCols = 3;  
     // Check for diagonal win right to left
     if (gameState.board[0][0] === gameState.board[1][1] &&
       gameState.board[1][1] === gameState.board[2][2] &&
       gameState.board[0][0] !== null) {
       // Right to left, top to bottom diagonal win
       return true;
-    }
-  
+    } 
     // Check for diagonal win left to right
     if (gameState.board[0][2] === gameState.board[1][1] &&
       gameState.board[1][1] === gameState.board[2][0] &&
@@ -338,7 +308,6 @@ var game = {
       // Left to right, top to bottom diagonal win
       return true;
     }
-  
     // Checking each row for a horizontal win
     for (var row = 0; row < numRows; row++) {
       if (gameState.board[row][0] === gameState.board[row][1] &&
@@ -348,7 +317,6 @@ var game = {
         return true;
       }
     }
-  
     // Checking each column for a vertical win
     for (var col = 0; col < numCols; col++) {
       if (gameState.board[0][col] === gameState.board[1][col] &&
@@ -359,29 +327,10 @@ var game = {
       }
     }
     return false;
-  }
+}
   
-  /** 
-  
-  // Pre-Minimax AI, randomly selecting a space on the board.
-  
-  function aiGenerateRandomPlay() {
-    var randRow = Math.floor(Math.random() * 3);
-    var randCol = Math.floor(Math.random() * 3);
-    var validMove = spaceFree(randRow, randCol);
-    while (!validMove) {
-      randRow = Math.floor(Math.random() * 3);
-      randCol = Math.floor(Math.random() * 3);
-      validMove = spaceFree(randRow, randCol);
-    }
-    return [randRow, randCol];
-  }
-  
-  */
-  
-  
-  // Checking whether the last move made has triggered a win, and if so triggers a win animation.
-  function hasWon() {
+// Checking whether the last move made has triggered a win, and if so triggers a win animation.
+function hasWon() {
     const numRows = 3;
     const numCols = 3;
   
@@ -397,8 +346,7 @@ var game = {
       $("#c22").addClass("cell-win");
       
       return true;
-    }
-  
+    } 
     // Check for diagonal win left to right
     if (game.board[0][2] === game.board[1][1] &&
       game.board[1][1] === game.board[2][0] &&
@@ -412,7 +360,6 @@ var game = {
       
       return true;
     }
-  
     // Checking each row for a horizontal win
     for (var row = 0; row < numRows; row++) {
       if (game.board[row][0] === game.board[row][1] &&
@@ -427,7 +374,6 @@ var game = {
         return true;
       }
     }
-  
     // Checking each column for a vertical win
     for (var col = 0; col < numCols; col++) {
       if (game.board[0][col] === game.board[1][col] &&
@@ -442,42 +388,38 @@ var game = {
         return true;
       }
     }
-  
     return false;
-  }
+}
   
-  // Transitions the screen from the game grid to a game over menu.
-  function gameOver(winCase) {
+// Transitions the screen from the game grid to a game over menu.
+function gameOver(winCase) {
     $("#game-grid").hide();
-    $("#game-over").fadeIn(500);
-  
+    $("#game-over").fadeIn(500);  
     if (winCase === game.playerMark) {
       // Player wins
-      $("#game-end-heading").text("You have claimed victory.");
-      $("#game-end-subheading").text("May you bathe in tic-tac-toe glory.");
+      $("#game-end-heading").text("Вы заявили о своей победе.");
+      $("#game-end-subheading").text("Пусть ты искупаешься в лучах славы игры в крестики-нолики.");
       
     } else if (winCase === game.aiMark) {
       // PC wins
-      $("#game-end-heading").text("Alas, the computer has claimed victory!");
-      $("#game-end-subheading").text("May they bathe their circuits in tic-tac-toe glory.");
+      $("#game-end-heading").text("Увы, Искусственный интеллект одержал победу!");
+      $("#game-end-subheading").text("Пусть они искупают свои круги в славе игры в крестики-нолики.");
     } else {
       // Draw
-      $("#game-end-heading").text("X and O, ancient enemies, have concluded their bout in a draw.");
-      $("#game-end-subheading").text("Perhaps their feud will be settled in another life, another dimension...");
+      $("#game-end-heading").text("X и O, давние враги, завершили свой поединок вничью.");
+      $("#game-end-subheading").text("Возможно, их вражда разрешится в другой жизни, в другом измерении...");
     }
-  }
+}
   
-  $gameResetBtn.on('click', resetGame);
+$gameResetBtn.on('click', resetGame);
   
-  function resetGame() {
+function resetGame() {
     $("#game-over").hide();
     $("#game-grid").hide();
-    $("#game-configuration").fadeIn(500);
-  
+    $("#game-configuration").fadeIn(500);  
     $(".game-cell").empty();
     $(".cell").removeClass("cell-selected");
-    $(".cell").removeClass("cell-win");
-    
+    $(".cell").removeClass("cell-win");    
     game.board = [
       [null, null, null],
       [null, null, null],
@@ -485,4 +427,4 @@ var game = {
     ];
     game.turnsPlayed = 0;
     game.playerTurn = true;
-  }
+}
